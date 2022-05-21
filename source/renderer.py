@@ -5,15 +5,16 @@ import numpy as np
 
 from numba import njit
 
-colormap_img = pg.image.load('textures/eshka_color.png')
+colormap_img = pg.image.load('textures/C1W.png')
 colormap = pg.surfarray.array3d(colormap_img)
 
-heightmap_img = pg.image.load('textures/eshka_height.png')
+heightmap_img = pg.image.load('textures/D1.png')
 heightmap = pg.surfarray.array3d(heightmap_img)
 
 map_height = len(heightmap[0])
 map_width = len(heightmap)
 
+@njit(fastmath = True)
 def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
             screen_width, screen_height, delta_angle, ray_distance, fov_x, scale_height):
 

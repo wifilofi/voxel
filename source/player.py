@@ -18,35 +18,35 @@ class Player:
 
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
-            self.pitch += self.vel
+            self.pitch += self.velocity
 
         if pressed_key[pg.K_DOWN]:
-            self.pitch -= self.vel
+            self.pitch -= self.velocity
 
         if pressed_key[pg.K_LEFT]:
-            self.angle -= self.angle_vel
+            self.angle -= self.angle_velocity
 
         if pressed_key[pg.K_RIGHT]:
-            self.angle += self.angle_vel
+            self.angle += self.angle_velocity
 
         if pressed_key[pg.K_q]:
-            self.height += self.vel
+            self.height += self.velocity
 
         if pressed_key[pg.K_e]:
-            self.height -= self.vel
+            self.height -= self.velocity
 
         if pressed_key[pg.K_w]:
-            self.pos[0] += self.vel * cos_a
-            self.pos[1] += self.vel * sin_a
+            self.pos[0] += self.velocity * cos_a
+            self.pos[1] += self.velocity * sin_a
 
         if pressed_key[pg.K_s]:
-            self.pos[0] -= self.vel * cos_a
-            self.pos[1] -= self.vel * sin_a
+            self.pos[0] -= self.velocity * cos_a
+            self.pos[1] -= self.velocity * sin_a
 
         if pressed_key[pg.K_a]:
-            self.pos[0] += self.vel * sin_a
-            self.pos[1] -= self.vel * cos_a
+            self.pos[0] += self.velocity * sin_a
+            self.pos[1] -= self.velocity * cos_a
 
         if pressed_key[pg.K_d]:
-            self.pos[0] -= self.vel * sin_a
-            self.pos[1] += self.vel * cos_a
+            self.pos[0] -= self.velocity * sin_a
+            self.pos[1] += self.velocity * cos_a
