@@ -37,6 +37,11 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                     height_on_screen = int((player_height - heightmap[x, y][0])
                                            / depth * scale_height + player_pitch)
 
+                    depth *= math.cos(player_angle - ray_angle)
+                    height_on_screen = int((player_height - heightmap[x, y][0]) /
+                                           depth * scale_height + player_pitch)
+
+
                     if not contacted:
                         y_buffer[ray_index] = min(height_on_screen, screen_height)
                         contacted = True
