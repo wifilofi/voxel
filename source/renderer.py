@@ -21,7 +21,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
     screen_data[:] = np.array([0, 0, 0])
     y_buffer = np.full(screen_width, screen_height)
 
-    ray_angle = player_angle - fov_x
+    ray_angle = player_angle - fov_x / 2
 
     for ray_index in range(screen_width):
         contacted = False
@@ -37,11 +37,11 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
 
             if y < 0 or y >= map_height:
                 continue
-            depth *= math.cos(player_angle - ray_angle)
-            curvature = (depth / ray_distance) ** 2 * 6000
-            height_on_screen = int((player_height - heightmap[x, y][0] + curvature) /
-                                   depth * scale_height + player_pitch * 1000)
 
+            depth *= math.cos(player_angle - ray_angle)
+            curvature = (depth / ray_distance) ** 2 * 2000
+            corrected_height = heightmap[x, y][0] - curvature
+            height_on_screen = int((player_height - corrected_height) / depth * scale_height + player_pitch * 1000)
             if not contacted:
                 y_buffer[ray_index] = min(height_on_screen, screen_height)
                 contacted = True
@@ -50,7 +50,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 height_on_screen = 0
 
             if height_on_screen < y_buffer[ray_index]:
-                for screen_y in range(y_buffer[ray_index], y_buffer[ray_index] + 1):
+                for screen_y in range(height_on_screen, y_buffer[ray_index]):
                     screen_data[ray_index, screen_y] = colormap[x, y]
 
                 y_buffer[ray_index] = height_on_screen
@@ -63,8 +63,8 @@ class Renderer:
     def __init__(self, game):
         self.game = game
         self.player = game.player
-        self.fov_y = math.pi / 6
-        self.fov_x = self.fov_y / 2
+        self.fov_y = math.pi / 4
+        self.fov_x = math.pi / 3
         self.rays_amount = game.width
         self.delta_angle = (self.fov_x / self.rays_amount)
         self.ray_distance = 2000
