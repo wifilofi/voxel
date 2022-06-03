@@ -50,7 +50,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 height_on_screen = 0
 
             if height_on_screen < y_buffer[ray_index]:
-                for screen_y in range(height_on_screen, y_buffer[ray_index]):
+                for screen_y in range(y_buffer[ray_index], y_buffer[ray_index] + 1):
                     screen_data[ray_index, screen_y] = colormap[x, y]
 
                 y_buffer[ray_index] = height_on_screen

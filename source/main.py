@@ -23,7 +23,7 @@ class Game:
                     exit()
 
             self.clock.tick(60)
-            pg.display.set_caption('bery cool game')
+            pg.display.set_caption('berry cool game')
 
     def update(self):
         self.player.update()
