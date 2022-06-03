@@ -22,6 +22,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
     y_buffer = np.full(screen_width, screen_height)
 
     ray_angle = player_angle - fov_x / 2
+    tan_of_pitch = math.sin(player_pitch)
 
     for ray_index in range(screen_width):
         contacted = False
@@ -39,9 +40,9 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 continue
 
             curvature = (depth / ray_distance) ** 2 * 500
-            corrected_height = heightmap[x, y][0] - curvature
+            corrected_height = heightmap[x, y][0]
             depth *= math.cos(player_angle - ray_angle)
-            height_on_screen = int((player_height - corrected_height) / depth * scale_height + player_pitch * 1000)
+            height_on_screen = int((player_height - corrected_height) / depth * scale_height * tan_of_pitch)
             if not contacted:
                 y_buffer[ray_index] = min(height_on_screen, screen_height)
                 contacted = True

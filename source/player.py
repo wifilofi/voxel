@@ -9,8 +9,8 @@ class Player:
         self.pos = np.array([0, 0], dtype=float)
         self.angle = math.pi / 4
         self.height = 500
-        self.pitch = 0
-        self.angle_velocity = math.pi / 120
+        self.pitch = math.pi / 4
+        self.angle_velocity = math.pi / 240
         self.velocity = 10
 
     def normalize_vector(self, vector):
@@ -19,10 +19,10 @@ class Player:
     def update(self):
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
-            self.pitch += self.angle_velocity
+            self.pitch -= self.angle_velocity
 
         if pressed_key[pg.K_DOWN]:
-            self.pitch -= self.angle_velocity
+            self.pitch += self.angle_velocity
 
         if pressed_key[pg.K_LEFT]:
             self.angle -= self.angle_velocity
