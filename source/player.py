@@ -3,25 +3,26 @@ import math
 import numpy as np
 import pygame as pg
 
+
 class Player:
     def __init__(self):
-        self.pos = np.array([0, 0], dtype = float)
+        self.pos = np.array([0, 0], dtype=float)
         self.angle = math.pi / 4
         self.height = 500
-        self.pitch = 50
-        self.angle_velocity = 0.01
-        self.velocity = 5
+        self.pitch = math.pi / 4
+        self.angle_velocity = math.pi / 240
+        self.velocity = 10
+
+    def normalize_vector(self, vector):
+        return vector / math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
     def update(self):
-        sin_a = math.sin(self.angle)
-        cos_a = math.cos(self.angle)
-
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
-            self.pitch += self.velocity
+            self.pitch -= self.angle_velocity
 
         if pressed_key[pg.K_DOWN]:
-            self.pitch -= self.velocity
+            self.pitch += self.angle_velocity
 
         if pressed_key[pg.K_LEFT]:
             self.angle -= self.angle_velocity
@@ -35,18 +36,23 @@ class Player:
         if pressed_key[pg.K_e]:
             self.height -= self.velocity
 
+        x_velocity = 0
+        y_velocity = 0
         if pressed_key[pg.K_w]:
-            self.pos[0] += self.velocity * cos_a
-            self.pos[1] += self.velocity * sin_a
-
+            y_velocity += 1
         if pressed_key[pg.K_s]:
-            self.pos[0] -= self.velocity * cos_a
-            self.pos[1] -= self.velocity * sin_a
-
+            y_velocity -= 1
         if pressed_key[pg.K_a]:
-            self.pos[0] += self.velocity * sin_a
-            self.pos[1] -= self.velocity * cos_a
-
+            x_velocity += 1
         if pressed_key[pg.K_d]:
-            self.pos[0] -= self.velocity * sin_a
-            self.pos[1] += self.velocity * cos_a
+            x_velocity -= 1
+
+        if x_velocity == 0 and y_velocity == 0:
+            return
+
+        normalized = self.normalize_vector(np.array([x_velocity, y_velocity])) * self.velocity
+        theta = self.angle - math.pi / 2
+        sin = math.sin(theta)
+        cos = math.cos(theta)
+        self.pos[0] += normalized[0] * cos - normalized[1] * sin
+        self.pos[1] += normalized[0] * sin + normalized[1] * cos
