@@ -5,10 +5,10 @@ import numpy as np
 
 from numba import njit
 
-colormap_img = pg.image.load('textures/eshka_round_color.png')
+colormap_img = pg.image.load('textures/color_map_4.png')
 colormap = pg.surfarray.array3d(colormap_img)
 
-heightmap_img = pg.image.load('textures/eshka_round_map.png')
+heightmap_img = pg.image.load('textures/height_map_4.jpg')
 heightmap = pg.surfarray.array3d(heightmap_img) * -1
 
 map_height = len(heightmap[0])
@@ -38,9 +38,9 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
             if y < 0 or y >= map_height:
                 continue
 
-            depth *= math.cos(player_angle - ray_angle)
-            curvature = (depth / ray_distance) ** 2 * 2000
+            curvature = (depth / ray_distance) ** 2 * 500
             corrected_height = heightmap[x, y][0] - curvature
+            depth *= math.cos(player_angle - ray_angle)
             height_on_screen = int((player_height - corrected_height) / depth * scale_height + player_pitch * 1000)
             if not contacted:
                 y_buffer[ray_index] = min(height_on_screen, screen_height)
