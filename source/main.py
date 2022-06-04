@@ -1,8 +1,14 @@
+import numpy as np
 import pygame as pg
 import math
 from os.path import exists
 from renderer import Renderer, RendererSettings, BackgroundConfig, Map
 from player import Player
+from numba.core.errors import NumbaDeprecationWarning, NumbaPendingDeprecationWarning
+import warnings
+
+warnings.simplefilter('ignore', category=NumbaDeprecationWarning)
+warnings.simplefilter('ignore', category=NumbaPendingDeprecationWarning)
 
 
 class SizesNotMatchException(Exception):
@@ -76,14 +82,13 @@ def get_custom_maps():
     print("Loading begins")
     try:
         loaded = load_map(path_to_color_map, path_to_height_map)
-        return loaded
     except Exception as e:
         print("Failed to load maps")
         print(e)
         raise e
 
     print("Map was successfully loaded")
-    return map
+    return loaded
 
 
 class Game:
@@ -101,8 +106,7 @@ class Game:
 
         """
 
-        map = load_map("textures/color_map_4.png", "textures/height_map_4.jpg")
-        #map = get_custom_maps()
+        map = get_custom_maps()
 
         self.width: int = 800
         self.height: int = 450
@@ -111,8 +115,8 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.player = Player()
-        color_near_terrain = [75, 165, 210]
-        high_color = [38, 95, 160]
+        color_near_terrain = np.array([75, 165, 210])
+        high_color = np.array([38, 95, 160])
 
         # Get height parameters from player and provide it to settings
         background = BackgroundConfig(self.player.minimum_height, self.player.maximum_height, color_near_terrain,
