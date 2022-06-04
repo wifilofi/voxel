@@ -22,7 +22,7 @@ class Player:
         self.angle_velocity = math.pi / 240
         self.velocity = 4
         self.minimum_height = 250
-        self.maximum_height = 450
+        self.maximum_height = 750
 
     def normalize_vector(self, vector):
         """Normalize vector.

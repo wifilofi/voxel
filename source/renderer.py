@@ -16,8 +16,20 @@ map_width = len(heightmap)
 
 
 @njit(fastmath=True)
-def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
-            screen_width, screen_height, delta_angle, ray_distance, fov_x, scale_height):
+def raycast(
+        screen_data,
+        player_pos,
+        player_angle,
+        player_height,
+        player_pitch,
+        screen_width,
+        screen_height,
+        delta_angle,
+        ray_distance,
+        fov_x,
+        scale_height,
+        background_color
+):
     """Perform raycasting.
 
     :param screen_data: array of points on screen
@@ -34,7 +46,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
 
     """
 
-    screen_data[:] = np.array([0, 0, 0])
+    screen_data[:] = np.array(background_color)
 
     # horizontal buffer for each ray
     y_buffer = np.full(screen_width, screen_height)
@@ -88,8 +100,34 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
     return screen_data
 
 
+class BackgroundConfig:
+    def __init__(self, min_height, max_height, min_color, max_color):
+        self.min_height = min_height
+        self.max_height = max_height
+        self.min_color = min_color
+        self.max_color = max_color
+
+
+class RendererSettings:
+    def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config):
+        self.ray_distance = ray_distance
+        self.scale_height = scale_height
+        self.fov_x = fov_x
+        self.fov_y = fov_y
+        self.__background_config = background_config
+
+    def get_background_color(self, height):
+        config = self.__background_config
+        clamped = np.clip(height, config.min_height, config.max_height)
+        coeff = (clamped - config.min_height) / (config.max_height - config.min_height)
+        result_color = [0, 0, 0]
+        for i in range(3):
+            result_color[i] = (config.max_color[i] - config.min_color[i]) * coeff + config.min_color[i]
+        return result_color
+
+
 class Renderer:
-    def __init__(self, game):
+    def __init__(self, game, renderer_settings):
         """Init renderer.
 
         :param game: instance of game
@@ -107,16 +145,16 @@ class Renderer:
 
         self.game = game
         self.player = game.player
-        self.fov_y = math.pi / 4
-        self.fov_x = math.pi / 3
         self.rays_amount = game.width
-        self.delta_angle = (self.fov_x / self.rays_amount)
+        self.renderer_settings = renderer_settings
+        self.delta_angle = (renderer_settings.fov_x / self.rays_amount)
         self.ray_distance = 2000
         self.scale_height = 300
         self.screen_data = np.full((game.width, game.height, 3), (0, 0, 0))
 
     def update(self):
         """Update state of renderer. Execute raycasting. """
+        background_color = self.renderer_settings.get_background_color(self.player.height)
         self.screen_data = raycast(screen_data=self.screen_data,
                                    player_pos=self.player.pos,
                                    player_angle=self.player.angle,
@@ -126,8 +164,9 @@ class Renderer:
                                    screen_height=self.game.height,
                                    delta_angle=self.delta_angle,
                                    ray_distance=self.ray_distance,
-                                   fov_x=self.fov_x,
-                                   scale_height=self.scale_height)
+                                   fov_x=self.renderer_settings.fov_x,
+                                   scale_height=self.scale_height,
+                                   background_color=background_color)
 
     def render(self):
         """Render raycasting result on screen."""
