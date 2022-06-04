@@ -17,7 +17,7 @@ class Player:
 
         self.pos = np.array([0, 0], dtype=float)
         self.angle = math.pi / 4
-        self.height = 500
+        self.height = 300
         self.pitch = math.pi / 4
         self.angle_velocity = math.pi / 240
         self.velocity = 10
@@ -36,12 +36,6 @@ class Player:
         """
 
         pressed_key = pg.key.get_pressed()
-        if pressed_key[pg.K_UP]:
-            self.pitch -= self.angle_velocity
-
-        if pressed_key[pg.K_DOWN]:
-            self.pitch += self.angle_velocity
-
         if pressed_key[pg.K_LEFT]:
             self.angle -= self.angle_velocity
 

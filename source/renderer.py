@@ -9,7 +9,7 @@ colormap_img = pg.image.load('textures/color_map_4.png')
 colormap = pg.surfarray.array3d(colormap_img)
 
 heightmap_img = pg.image.load('textures/height_map_4.jpg')
-heightmap = pg.surfarray.array3d(heightmap_img) * -1
+heightmap = pg.surfarray.array3d(heightmap_img)
 
 map_height = len(heightmap[0])
 map_width = len(heightmap)
@@ -61,7 +61,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 continue
 
             curvature = (depth / ray_distance) ** 2 * 500
-            corrected_height = heightmap[x, y][0] * -1
+            corrected_height = heightmap[x, y][0] - curvature
 
             # fix fish eye effect
             depth *= math.cos(player_angle - ray_angle)
@@ -112,7 +112,7 @@ class Renderer:
         self.rays_amount = game.width
         self.delta_angle = (self.fov_x / self.rays_amount)
         self.ray_distance = 2000
-        self.scale_height = 920
+        self.scale_height = 300
         self.screen_data = np.full((game.width, game.height, 3), (0, 0, 0))
 
     def update(self):
