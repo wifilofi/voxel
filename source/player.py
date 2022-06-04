@@ -15,12 +15,12 @@ class Player:
         :var self.velocity: movement speed.
         """
 
-        self.pos = np.array([0, 0], dtype=float)
+        self.pos = np.array([4000, 4000], dtype=float)
         self.angle = math.pi / 4
-        self.height = 300
+        self.height = 400
         self.pitch = math.pi / 4
         self.angle_velocity = math.pi / 240
-        self.velocity = 10
+        self.velocity = 4
 
     def normalize_vector(self, vector):
         """Normalize vector.
