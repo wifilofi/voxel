@@ -21,6 +21,8 @@ class Player:
         self.pitch = math.pi / 4
         self.angle_velocity = math.pi / 240
         self.velocity = 4
+        self.minimum_height = 250
+        self.maximum_height = 450
 
     def normalize_vector(self, vector):
         """Normalize vector.
@@ -36,32 +38,21 @@ class Player:
         """
 
         pressed_key = pg.key.get_pressed()
-        if pressed_key[pg.K_LEFT]:
-            self.angle -= self.angle_velocity
-
-        if pressed_key[pg.K_RIGHT]:
-            self.angle += self.angle_velocity
-
-        if pressed_key[pg.K_q]:
-            self.height += self.velocity
-
-        if pressed_key[pg.K_e]:
-            self.height -= self.velocity
-
         x_velocity = 0
-        y_velocity = 0
+        y_velocity = 1
         if pressed_key[pg.K_w]:
-            y_velocity += 1
+            self.height -= self.velocity
         if pressed_key[pg.K_s]:
-            y_velocity -= 1
+            self.height += self.velocity
         if pressed_key[pg.K_a]:
-            x_velocity += 1
+            self.angle -= self.angle_velocity
         if pressed_key[pg.K_d]:
-            x_velocity -= 1
+            self.angle += self.angle_velocity
 
         if x_velocity == 0 and y_velocity == 0:
             return
 
+        self.height = np.clip(self.height, self.minimum_height, self.maximum_height)
         normalized = self.normalize_vector(np.array([x_velocity, y_velocity])) * self.velocity
         theta = self.angle - math.pi / 2
         sin = math.sin(theta)
