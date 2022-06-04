@@ -34,8 +34,9 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
 
     """
 
-
     screen_data[:] = np.array([0, 0, 0])
+
+    # horizontal buffer for each ray
     y_buffer = np.full(screen_width, screen_height)
 
     ray_angle = player_angle - fov_x / 2
@@ -48,25 +49,34 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
 
         for depth in range(1, ray_distance):
             x = int(player_pos[0] + depth * cos_a)
+
+            # check whether coords are out of horizontal bound
             if x < 0 or x >= map_width:
                 continue
 
             y = int(player_pos[1] + depth * sin_a) % map_height
 
+            # check whether coords are out of vertical bound
             if y < 0 or y >= map_height:
                 continue
 
             curvature = (depth / ray_distance) ** 2 * 500
             corrected_height = heightmap[x, y][0]
+
+            # fix fish eye effect
             depth *= math.cos(player_angle - ray_angle)
             height_on_screen = int((player_height - corrected_height) / depth * scale_height * tan_of_pitch)
+
+            # fix clamping
             if not contacted:
                 y_buffer[ray_index] = min(height_on_screen, screen_height)
                 contacted = True
 
+            # fix mirror rendering
             if height_on_screen < 0:
                 height_on_screen = 0
 
+            # create vertical line
             if height_on_screen < y_buffer[ray_index]:
                 for screen_y in range(height_on_screen, y_buffer[ray_index]):
                     screen_data[ray_index, screen_y] = colormap[x, y]
@@ -74,6 +84,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 y_buffer[ray_index] = height_on_screen
 
         ray_angle += delta_angle
+
     return screen_data
 
 
