@@ -5,14 +5,10 @@ import numpy as np
 
 from numba import njit
 
-colormap_img = pg.image.load('textures/color_map_4.png')
-colormap = pg.surfarray.array3d(colormap_img)
-
-heightmap_img = pg.image.load('textures/height_map_4.jpg')
-heightmap = pg.surfarray.array3d(heightmap_img)
-
-map_height = len(heightmap[0])
-map_width = len(heightmap)
+class Map:
+    def __init__(self, color_map, heightmap):
+        self.color_map = color_map
+        self.heightmap = heightmap
 
 
 @njit(fastmath=True)
@@ -44,10 +40,13 @@ def raycast(
         fov_x,
         scale_height,
         background_color,
-        fading_size
+        fading_size,
+        colormap,
+        heightmap,
 ):
     """Perform raycasting.
 
+    :param fading_size: amount of pixel will be mixed with background color
     :param background_color: color of screen where no terrain was rendered
     :param screen_data: array of points on screen
     :param player_pos: player position
@@ -62,7 +61,8 @@ def raycast(
     :param scale_height: vertical scale
 
     """
-
+    map_height = len(heightmap[0])
+    map_width = len(heightmap)
     screen_data[:] = np.array(background_color)
 
     # horizontal buffer for each ray
@@ -138,6 +138,7 @@ class BackgroundConfig:
     Data structure to describe,
     how background color will change depending on height.
     """
+
     def __init__(self, min_height, max_height, min_color, max_color):
         self.min_height = min_height
         self.max_height = max_height
@@ -150,7 +151,8 @@ class RendererSettings:
     Data structure to provide access to temporal and permanent
     settings of rendering.
     """
-    def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config, fading_size):
+
+    def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config, fading_size, map):
         """
         Create settings
         :param ray_distance: max distance of draw
@@ -166,6 +168,7 @@ class RendererSettings:
         self.fov_y = fov_y
         self.fading_size = fading_size
         self.__background_config = background_config
+        self.map = map
 
     def get_background_color(self, height):
         """
@@ -210,6 +213,7 @@ class Renderer:
     def update(self):
         """Update state of renderer. Execute raycasting. """
         background_color = self.renderer_settings.get_background_color(self.player.height)
+
         self.screen_data = raycast(screen_data=self.screen_data,
                                    player_pos=self.player.pos,
                                    player_angle=self.player.angle,
@@ -222,7 +226,9 @@ class Renderer:
                                    fov_x=self.renderer_settings.fov_x,
                                    scale_height=self.renderer_settings.scale_height,
                                    background_color=background_color,
-                                   fading_size=self.renderer_settings.fading_size)
+                                   fading_size=self.renderer_settings.fading_size,
+                                   colormap=self.renderer_settings.map.color_map,
+                                   heightmap=self.renderer_settings.map.heightmap)
 
     def render(self):
         """Render raycasting result on screen."""
