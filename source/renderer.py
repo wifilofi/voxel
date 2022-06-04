@@ -16,6 +16,13 @@ map_width = len(heightmap)
 
 
 @njit(fastmath=True)
+def mix_colors(a, b, factor):
+    result = [0, 0, 0]
+    for i in range(3):
+        result[i] = (b[i] - a[i]) * factor + a[i]
+
+
+@njit(fastmath=True)
 def raycast(
         screen_data,
         player_pos,
@@ -28,10 +35,12 @@ def raycast(
         ray_distance,
         fov_x,
         scale_height,
-        background_color
+        background_color,
+        fading_size
 ):
     """Perform raycasting.
 
+    :param background_color: color of screen where no terrain was rendered
     :param screen_data: array of points on screen
     :param player_pos: player position
     :param player_angle: player rotation
@@ -59,6 +68,7 @@ def raycast(
         sin_a = math.sin(ray_angle)
         cos_a = math.cos(ray_angle)
 
+        max_vertical_position = -1
         for depth in range(1, ray_distance):
             x = int(player_pos[0] + depth * cos_a)
 
@@ -90,12 +100,27 @@ def raycast(
 
             # create vertical line
             if height_on_screen < y_buffer[ray_index]:
+                max_vertical_position = y_buffer[ray_index] - 1
                 for screen_y in range(height_on_screen, y_buffer[ray_index]):
                     screen_data[ray_index, screen_y] = colormap[x, y]
 
                 y_buffer[ray_index] = height_on_screen
 
         ray_angle += delta_angle
+        if max_vertical_position < 0:
+            continue
+
+        for delta in range(0, fading_size):
+            screen_y = max_vertical_position + delta
+            if screen_y < 0:
+                continue
+
+            current_color = screen_data[ray_index, screen_y]
+            result = [0, 0, 0]
+            factor = delta / fading_size
+            for i in range(3):
+                result[i] = (current_color[i] - background_color[i]) * factor + background_color[i]
+            screen_data[ray_index, screen_y] = result
 
     return screen_data
 
@@ -109,11 +134,12 @@ class BackgroundConfig:
 
 
 class RendererSettings:
-    def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config):
+    def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config, fading_size):
         self.ray_distance = ray_distance
         self.scale_height = scale_height
         self.fov_x = fov_x
         self.fov_y = fov_y
+        self.fading_size = fading_size
         self.__background_config = background_config
 
     def get_background_color(self, height):
@@ -164,7 +190,8 @@ class Renderer:
                                    ray_distance=self.renderer_settings.ray_distance,
                                    fov_x=self.renderer_settings.fov_x,
                                    scale_height=self.renderer_settings.scale_height,
-                                   background_color=background_color)
+                                   background_color=background_color,
+                                   fading_size=self.renderer_settings.fading_size)
 
     def render(self):
         """Render raycasting result on screen."""
