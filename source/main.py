@@ -6,7 +6,8 @@ from player import Player
 
 class Game:
     def __init__(self):
-        """Init game.
+        """
+        Init game
 
         :var self.width: horizontal resolution
         :var self.height: vertical resolution
@@ -25,8 +26,10 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.player = Player()
-        background = BackgroundConfig(self.player.minimum_height, self.player.maximum_height, [75, 165, 210],
-                                      [38, 95, 160])
+        color_near_terrain = [75, 165, 210]
+        high_color = [38, 95, 160]
+        background = BackgroundConfig(self.player.minimum_height, self.player.maximum_height, color_near_terrain,
+                                      high_color)
         settings = RendererSettings(2000, 300, math.pi / 3, math.pi / 4, background, 7)
         self.renderer = Renderer(self, settings)
 

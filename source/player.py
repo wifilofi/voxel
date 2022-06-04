@@ -5,14 +5,20 @@ import pygame as pg
 
 
 class Player:
+    """
+    Represents current player state and provides methods to get input
+    """
     def __init__(self):
-        """Init player variables.
+        """
+        Init player variables.
 
         :var self.pos: position on 2D map
         :var self.angle: rotation angle
         :var self.pitch: vertical field of view
         :var self.angle_velocity: rotation speed
-        :var self.velocity: movement speed.
+        :var self.velocity: movement speed
+        :var self.minimum_height minimum height that player can move on
+        :var self.maximum_height maximum height that player can move on
         """
 
         self.pos = np.array([4000, 4000], dtype=float)
@@ -33,13 +39,11 @@ class Player:
         return vector / math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
 
-    def update(self):
-        """Update player state. Check controls.
+    def handle_input(self):
         """
-
+        Get input from player
+        """
         pressed_key = pg.key.get_pressed()
-        x_velocity = 0
-        y_velocity = 1
         if pressed_key[pg.K_w]:
             self.height -= self.velocity
         if pressed_key[pg.K_s]:
@@ -49,13 +53,21 @@ class Player:
         if pressed_key[pg.K_d]:
             self.angle += self.angle_velocity
 
-        if x_velocity == 0 and y_velocity == 0:
-            return
 
+    def update(self):
+        """
+        Update player state. Check controls.
+        """
+
+        self.handle_input()
+        # Limit possible player height.
         self.height = np.clip(self.height, self.minimum_height, self.maximum_height)
-        normalized = self.normalize_vector(np.array([x_velocity, y_velocity])) * self.velocity
+        # Get normalized velocity vector to get rid of acceleration when players press two key at the same time.
+        normalized = self.normalize_vector(np.array([0, 1])) * self.velocity
+        # Angle correction, to move zero point 90 degrees counterclockwise
         theta = self.angle - math.pi / 2
         sin = math.sin(theta)
         cos = math.cos(theta)
+        # Move player
         self.pos[0] += normalized[0] * cos - normalized[1] * sin
         self.pos[1] += normalized[0] * sin + normalized[1] * cos

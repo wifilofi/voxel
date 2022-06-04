@@ -17,6 +17,14 @@ map_width = len(heightmap)
 
 @njit(fastmath=True)
 def mix_colors(a, b, factor):
+    """
+    Mix colors with linear interpolation.
+    For example for 0.5 factor the result color will be average between a na b.
+    :param a: first color, will be result for 0 factor. Array of 3 elements
+    :param b:second color, will be result for 1 factor. Array of 3 elements
+    :param factor: linear mix factor
+    :return: mix of 2 colors
+    """
     result = [0, 0, 0]
     for i in range(3):
         result[i] = (b[i] - a[i]) * factor + a[i]
@@ -126,6 +134,10 @@ def raycast(
 
 
 class BackgroundConfig:
+    """
+    Data structure to describe,
+    how background color will change depending on height.
+    """
     def __init__(self, min_height, max_height, min_color, max_color):
         self.min_height = min_height
         self.max_height = max_height
@@ -134,7 +146,20 @@ class BackgroundConfig:
 
 
 class RendererSettings:
+    """
+    Data structure to provide access to temporal and permanent
+    settings of rendering.
+    """
     def __init__(self, ray_distance, scale_height, fov_x, fov_y, background_config, fading_size):
+        """
+        Create settings
+        :param ray_distance: max distance of draw
+        :param scale_height: coefficient to transform height to pixels
+        :param fov_x: field of view for horizontal
+        :param fov_y: field of view for vertical
+        :param background_config: config of background color
+        :param fading_size: amount of pixel to create transition from background to terrain
+        """
         self.ray_distance = ray_distance
         self.scale_height = scale_height
         self.fov_x = fov_x
@@ -143,6 +168,11 @@ class RendererSettings:
         self.__background_config = background_config
 
     def get_background_color(self, height):
+        """
+        Calculate background color depending on height
+        :param height: current height to calculate background color
+        :return: background color
+        """
         config = self.__background_config
         clamped = np.clip(height, config.min_height, config.max_height)
         coeff = (clamped - config.min_height) / (config.max_height - config.min_height)
@@ -154,7 +184,8 @@ class RendererSettings:
 
 class Renderer:
     def __init__(self, game, renderer_settings):
-        """Init renderer.
+        """
+        Init renderer.
 
         :param game: instance of game
 
