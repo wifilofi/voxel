@@ -5,7 +5,16 @@ import pygame as pg
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, mim):
+        """Init player variables.
+
+        :var self.pos: position on 2D map
+        :var self.angle: rotation angle
+        :var self.pitch: vertical field of view
+        :var self.angle_velocity: rotation speed
+        :var self.velocity: movement speed.
+        """
+
         self.pos = np.array([0, 0], dtype=float)
         self.angle = math.pi / 4
         self.height = 500
@@ -14,9 +23,18 @@ class Player:
         self.velocity = 10
 
     def normalize_vector(self, vector):
+        """Normalize vector.
+
+        :param vector: input vector
+        :returns: normalized input vector.
+        """
         return vector / math.sqrt(vector[0] ** 2 + vector[1] ** 2)
 
+
     def update(self):
+        """Update player state. Check controls.
+        """
+
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_UP]:
             self.pitch -= self.angle_velocity
