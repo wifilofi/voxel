@@ -18,7 +18,21 @@ map_width = len(heightmap)
 @njit(fastmath=True)
 def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
             screen_width, screen_height, delta_angle, ray_distance, fov_x, scale_height):
+    """Perform raycasting.
 
+    :param screen_data: array of points on screen
+    :param player_pos: player position
+    :param player_angle: player rotation
+    :param player_height: player height
+    :param player_pitch: player vertical fov
+    :param screen_width: screen horizontal resolution
+    :param screen_height: screen vertical resolution
+    :param delta_angle: angle difference
+    :param ray_distance: render distance
+    :param fov_x: horizontal fov
+    :param scale_height: vertical scale
+
+    """
 
 
     screen_data[:] = np.array([0, 0, 0])
