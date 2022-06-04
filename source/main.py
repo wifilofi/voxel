@@ -32,6 +32,7 @@ def load_map(color_map_path, height_map_path):
 
     img = pg.image.load(color_map_path)
     colormap = pg.surfarray.array3d(img)
+
     img = pg.image.load(height_map_path)
     heightmap = pg.surfarray.array3d(img)
 
@@ -39,6 +40,50 @@ def load_map(color_map_path, height_map_path):
         raise SizesNotMatchException("Colormap and heightmap sizes don't match.")
 
     return Map(colormap, heightmap)
+
+
+def get_custom_maps():
+    """
+    Get input from user
+    First input is path to color map
+    Second input is path to heightmap
+
+    Every provided path is checked and if user will provide wrong path,
+    he will be informed.
+    :return: loaded map if it was successfully loaded
+    """
+    path_to_color_map = None
+
+    # Get player input until it will be ok
+    while path_to_color_map is None:
+        path = input("Path to color map: ")
+        if exists(path):
+            path_to_color_map = path
+            continue
+
+        print("Failed to load color map, specify correct path, please")
+
+    path_to_height_map = None
+    # Get player input until it will be ok
+    while path_to_height_map is None:
+        path = input("Path to height map: ")
+        if exists(path):
+            path_to_height_map = path
+            continue
+
+        print("Failed to load height map, specify correct path, please")
+
+    print("Loading begins")
+    try:
+        loaded = load_map(path_to_color_map, path_to_height_map)
+        return loaded
+    except Exception as e:
+        print("Failed to load maps")
+        print(e)
+        raise e
+
+    print("Map was successfully loaded")
+    return map
 
 
 class Game:
@@ -56,6 +101,9 @@ class Game:
 
         """
 
+        map = load_map("textures/color_map_4.png", "textures/height_map_4.jpg")
+        #map = get_custom_maps()
+
         self.width: int = 800
         self.height: int = 450
         self.resolution: tuple[int, int] = (self.width, self.height)
@@ -65,9 +113,12 @@ class Game:
         self.player = Player()
         color_near_terrain = [75, 165, 210]
         high_color = [38, 95, 160]
-        map = load_map("textures/color_map_4.png", "textures/height_map_4.jpg")
+
+        # Get height parameters from player and provide it to settings
         background = BackgroundConfig(self.player.minimum_height, self.player.maximum_height, color_near_terrain,
                                       high_color)
+
+        # Create default settings
         settings = RendererSettings(2000, 300, math.pi / 3, math.pi / 4, background, 7, map)
         self.renderer = Renderer(self, settings)
 

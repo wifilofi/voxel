@@ -5,8 +5,19 @@ import numpy as np
 
 from numba import njit
 
+
 class Map:
+    """
+    Data structure with loaded maps
+    """
+
     def __init__(self, color_map, heightmap):
+        """
+        Create map data structure
+        :param color_map: loaded array of colors
+        :param heightmap: loaded array of heights
+        """
+
         self.color_map = color_map
         self.heightmap = heightmap
 
@@ -44,8 +55,15 @@ def raycast(
         colormap,
         heightmap,
 ):
-    """Perform raycasting.
+    """
+    Perform raycasting 1d raycasting.
+    How it works:
+    Image 1d line of color. Every pixel in that line represents ray.
+    Every single ray goes throw whole map and check every height map value it can cross.
+    Every crossed value will be drawn on screen as vertical bar
 
+    :param colormap: 2d color map
+    :param heightmap: 2d map of heights
     :param fading_size: amount of pixel will be mixed with background color
     :param background_color: color of screen where no terrain was rendered
     :param screen_data: array of points on screen
@@ -61,6 +79,7 @@ def raycast(
     :param scale_height: vertical scale
 
     """
+
     map_height = len(heightmap[0])
     map_width = len(heightmap)
     screen_data[:] = np.array(background_color)
@@ -106,7 +125,7 @@ def raycast(
             if height_on_screen < 0:
                 height_on_screen = 0
 
-            # create vertical line
+            # Create vertical bars
             if height_on_screen < y_buffer[ray_index]:
                 max_vertical_position = y_buffer[ray_index] - 1
                 for screen_y in range(height_on_screen, y_buffer[ray_index]):
@@ -118,6 +137,8 @@ def raycast(
         if max_vertical_position < 0:
             continue
 
+        # That part corresponds on fading
+        # It is used to make border between terrain and sky look better
         for delta in range(0, fading_size):
             screen_y = max_vertical_position + delta
             if screen_y < 0:
@@ -211,7 +232,10 @@ class Renderer:
         self.screen_data = np.full((game.width, game.height, 3), (0, 0, 0))
 
     def update(self):
-        """Update state of renderer. Execute raycasting. """
+        """
+        Update state of renderer.
+        Cast all horizontal rays
+        """
         background_color = self.renderer_settings.get_background_color(self.player.height)
 
         self.screen_data = raycast(screen_data=self.screen_data,
@@ -231,5 +255,7 @@ class Renderer:
                                    heightmap=self.renderer_settings.map.heightmap)
 
     def render(self):
-        """Render raycasting result on screen."""
+        """
+        Copy array of colors to player screen
+        """
         pg.surfarray.blit_array(self.game.display, self.screen_data)
