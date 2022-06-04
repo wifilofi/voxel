@@ -4,6 +4,18 @@ from player import Player
 
 class Game:
     def __init__(self):
+        """Init game.
+
+        :var self.width: horizontal resolution
+        :var self.height: vertical resolution
+        :var self.resolution: resolution
+        :var self.display: instance of pygame display
+        :var self.clock: instance of pygame clock
+        :var self.player: instance of player
+        :var self.renderer: instance of renderer
+
+        """
+
         self.width: int = 800
         self.height: int = 450
         self.resolution: tuple[int, int] = (self.width, self.height)
@@ -14,6 +26,8 @@ class Game:
         self.renderer = Renderer(self)
 
     def run(self):
+        """Run game cycle"""
+
         while True:
             self.update()
             self.render()
@@ -26,10 +40,14 @@ class Game:
             pg.display.set_caption('berry cool game')
 
     def update(self):
+        """Update game state."""
+
         self.player.update()
         self.renderer.update()
 
     def render(self):
+        """Render game."""
+
         self.renderer.render()
         pg.display.flip()
 
