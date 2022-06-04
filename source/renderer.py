@@ -148,8 +148,6 @@ class Renderer:
         self.rays_amount = game.width
         self.renderer_settings = renderer_settings
         self.delta_angle = (renderer_settings.fov_x / self.rays_amount)
-        self.ray_distance = 2000
-        self.scale_height = 300
         self.screen_data = np.full((game.width, game.height, 3), (0, 0, 0))
 
     def update(self):
@@ -163,9 +161,9 @@ class Renderer:
                                    screen_width=self.game.width,
                                    screen_height=self.game.height,
                                    delta_angle=self.delta_angle,
-                                   ray_distance=self.ray_distance,
+                                   ray_distance=self.renderer_settings.ray_distance,
                                    fov_x=self.renderer_settings.fov_x,
-                                   scale_height=self.scale_height,
+                                   scale_height=self.renderer_settings.scale_height,
                                    background_color=background_color)
 
     def render(self):
