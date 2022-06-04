@@ -18,6 +18,9 @@ map_width = len(heightmap)
 @njit(fastmath=True)
 def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
             screen_width, screen_height, delta_angle, ray_distance, fov_x, scale_height):
+
+
+
     screen_data[:] = np.array([0, 0, 0])
     y_buffer = np.full(screen_width, screen_height)
 
@@ -62,6 +65,21 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
 
 class Renderer:
     def __init__(self, game):
+        """Init renderer.
+
+        :param game: instance of game
+
+        :var self.player: instance of player
+        :var self.fov_y: vertical fov
+        :var self.fov_x: horizontal fov
+        :var self.rays_amount: horizontal resolution
+        :var self.delta_angle: angle difference
+        :var self.ray_distance: render distance
+        :var self.scale_height: vertical scale
+        :var self.screen_data: array of points on screen
+
+        """
+
         self.game = game
         self.player = game.player
         self.fov_y = math.pi / 4
@@ -73,6 +91,7 @@ class Renderer:
         self.screen_data = np.full((game.width, game.height, 3), (0, 0, 0))
 
     def update(self):
+        """Update state of renderer. Execute raycasting. """
         self.screen_data = raycast(screen_data=self.screen_data,
                                    player_pos=self.player.pos,
                                    player_angle=self.player.angle,
@@ -86,4 +105,5 @@ class Renderer:
                                    scale_height=self.scale_height)
 
     def render(self):
+        """Render raycasting result on screen."""
         pg.surfarray.blit_array(self.game.display, self.screen_data)
