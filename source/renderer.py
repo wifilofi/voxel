@@ -61,7 +61,7 @@ def raycast(screen_data, player_pos, player_angle, player_height, player_pitch,
                 continue
 
             curvature = (depth / ray_distance) ** 2 * 500
-            corrected_height = heightmap[x, y][0]
+            corrected_height = heightmap[x, y][0] * -1
 
             # fix fish eye effect
             depth *= math.cos(player_angle - ray_angle)

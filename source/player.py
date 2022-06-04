@@ -5,7 +5,7 @@ import pygame as pg
 
 
 class Player:
-    def __init__(self, mim):
+    def __init__(self):
         """Init player variables.
 
         :var self.pos: position on 2D map

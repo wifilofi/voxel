@@ -47,7 +47,6 @@ class Game:
 
     def render(self):
         """Render game."""
-
         self.renderer.render()
         pg.display.flip()
 
